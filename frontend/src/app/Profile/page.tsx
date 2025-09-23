@@ -1,7 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Search, Plus, CreditCard, Settings, BarChart3, Heart, Share, X } from 'lucide-react';
+
+
 
 interface Donor {
   id: string;
@@ -21,6 +24,7 @@ interface Post {
 const ProfilePageWithDonation: React.FC = () => {
   const [showDonationModal, setShowDonationModal] = useState(true);
   const [donationAmount, setDonationAmount] = useState('');
+  const router = useRouter();
 
   const topDonors: Donor[] = [
     { id: '1', name: 'Donador numero 1', followers: '# seguidores', rank: 1 },
@@ -52,16 +56,25 @@ const ProfilePageWithDonation: React.FC = () => {
   };
 
   return (
+    
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
       <div className="w-32 bg-teal-500 text-white flex flex-col items-center py-6 space-y-8">
         <div className="text-2xl font-bold">Olbil</div>
         
         <nav className="flex flex-col space-y-6">
-          <Search className="w-6 h-6 cursor-pointer hover:text-teal-200" />
-          <Plus className="w-6 h-6 cursor-pointer hover:text-teal-200" />
-          <CreditCard className="w-6 h-6 cursor-pointer hover:text-teal-200" />
-          <CreditCard className="w-6 h-6 cursor-pointer hover:text-teal-200" />
+          <Search 
+            className="w-6 h-6 cursor-pointer hover:text-teal-200" 
+            onClick={() => router.push('/SearchProfile')} 
+          />
+          <Plus 
+            className="w-6 h-6 cursor-pointer hover:text-teal-200" 
+            onClick={() => alert('Funcionalidad en desarrollo')} 
+          />
+          <CreditCard 
+            className="w-6 h-6 cursor-pointer hover:text-teal-200" 
+            onClick={() => router.push('/AddWallet')} 
+          />
         </nav>
         
         <div className="mt-auto">
@@ -74,7 +87,7 @@ const ProfilePageWithDonation: React.FC = () => {
         {/* Header */}
         <div className="flex justify-end items-center mb-8">
           <div className="flex items-center">
-            <span className="text-gray-700 mr-3">nombre_usuario</span>
+            <span className="text-gray-700 mr-3" onClick={() => router.push('/')}>nombre_usuario</span>
             <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-lg">
               👨‍💼
             </div>
