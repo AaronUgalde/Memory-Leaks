@@ -1,10 +1,24 @@
+// src/app/profile/[userId]/ProfileWithDonationClient.tsx
 'use client';
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, Plus, CreditCard, Settings, BarChart3, Heart, Share, X } from 'lucide-react';
+import api from '../../../lib/api';
 
-
+interface User {
+  id: string;
+  username: string;
+  display_name: string;
+  bio: string;
+  profile_image_url: string;
+  website_url: string;
+  user_type: string;
+  organization_type: string;
+  verification_status: boolean;
+  allow_donations: boolean;
+  created_at: string;
+}
 
 interface Donor {
   id: string;
@@ -21,15 +35,18 @@ interface Post {
   shares: number;
 }
 
-const ProfilePageWithDonation: React.FC = () => {
-  const [showDonationModal, setShowDonationModal] = useState(true);
+export default function ProfileWithDonationClient({ initialUser }: { initialUser: User | null }) {
+  const [user] = useState<User | null>(initialUser);
+  const [showDonationModal, setShowDonationModal] = useState(false);
   const [donationAmount, setDonationAmount] = useState('');
   const router = useRouter();
 
+  if (!user) return <div className="p-8">Usuario no encontrado</div>;
+
   const topDonors: Donor[] = [
-    { id: '1', name: 'Donador numero 1', followers: '# seguidores', rank: 1 },
-    { id: '2', name: 'Donador num. 2', followers: '# seguidores', rank: 2 },
-    { id: '3', name: 'Donador num. 3', followers: '# seguidores', rank: 3 },
+    { id: '1', name: 'Donador numero 1', followers: '1.2k seguidores', rank: 1 },
+    { id: '2', name: 'Donador num. 2', followers: '800 seguidores', rank: 2 },
+    { id: '3', name: 'Donador num. 3', followers: '500 seguidores', rank: 3 },
   ];
 
   const posts: Post[] = [
@@ -49,34 +66,34 @@ const ProfilePageWithDonation: React.FC = () => {
     }
   ];
 
-  const handleDonate = () => {
-    // Handle donation logic
-    console.log('Donating:', donationAmount);
+  const handleDonate = async () => {
+    const initiateRespone = await api.post('/donations',
+      {
+        recipientUserId: user.id,
+        amount: donationAmount,
+        currency: "USD",
+        message: "Gran contenido, gracias!",
+        isAnonymous: false
+      }
+    );
+    console.log('Respuesta de la API de donación:', initiateRespone.data);
+    // Aquí iría la lógica real de donación
+    console.log('Donando a:', user.id, 'monto:', donationAmount);
     setShowDonationModal(false);
+    setDonationAmount('');
   };
 
+
   return (
-    
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
       <div className="w-32 bg-teal-500 text-white flex flex-col items-center py-6 space-y-8">
         <div className="text-2xl font-bold">Olbil</div>
-        
         <nav className="flex flex-col space-y-6">
-          <Search 
-            className="w-6 h-6 cursor-pointer hover:text-teal-200" 
-            onClick={() => router.push('/SearchProfile')} 
-          />
-          <Plus 
-            className="w-6 h-6 cursor-pointer hover:text-teal-200" 
-            onClick={() => alert('Funcionalidad en desarrollo')} 
-          />
-          <CreditCard 
-            className="w-6 h-6 cursor-pointer hover:text-teal-200" 
-            onClick={() => router.push('/AddWallet')} 
-          />
+          <Search className="w-6 h-6 cursor-pointer hover:text-teal-200" onClick={() => router.push('/SearchProfile')} />
+          <Plus className="w-6 h-6 cursor-pointer hover:text-teal-200" onClick={() => alert('Funcionalidad en desarrollo')} />
+          <CreditCard className="w-6 h-6 cursor-pointer hover:text-teal-200" onClick={() => router.push('/AddWallet')} />
         </nav>
-        
         <div className="mt-auto">
           <Settings className="w-6 h-6 cursor-pointer hover:text-teal-200" />
         </div>
@@ -87,9 +104,15 @@ const ProfilePageWithDonation: React.FC = () => {
         {/* Header */}
         <div className="flex justify-end items-center mb-8">
           <div className="flex items-center">
-            <span className="text-gray-700 mr-3" onClick={() => router.push('/')}>nombre_usuario</span>
-            <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-lg">
-              👨‍💼
+            <span className="text-gray-700 mr-3 cursor-pointer" onClick={() => router.push(`/profile/${user.username}`)}>
+              {user.display_name}
+            </span>
+            <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg bg-blue-500 overflow-hidden">
+              {user.profile_image_url ? (
+                <img src={user.profile_image_url} alt={`${user.display_name} avatar`} className="w-10 h-10 object-cover" />
+              ) : (
+                '👨‍💼'
+              )}
             </div>
           </div>
         </div>
@@ -109,26 +132,47 @@ const ProfilePageWithDonation: React.FC = () => {
 
             {/* Profile Section */}
             <div className="flex items-start mb-8">
-              <div className="w-24 h-24 bg-yellow-400 rounded-full flex items-center justify-center text-4xl mr-6 -mt-12 relative z-10 border-4 border-white">
-                🎭
+              <div className="w-24 h-24 bg-yellow-400 rounded-full flex items-center justify-center text-4xl mr-6 -mt-12 relative z-10 border-4 border-white overflow-hidden">
+                {user.profile_image_url ? (
+                  <img src={user.profile_image_url} alt="avatar" className="w-24 h-24 object-cover rounded-full" />
+                ) : (
+                  '🎭'
+                )}
               </div>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h1 className="text-3xl font-bold text-gray-800 mb-2">Perfil increíble</h1>
-                    <p className="text-teal-600 font-medium"># Seguidores</p>
+                    <h1 className="text-3xl font-bold text-gray-800 mb-2">{user.display_name}</h1>
+                    <p className="text-teal-600 font-medium">{user.bio || '# Sin bio'}</p>
+                    {user.website_url && (
+                      <a className="text-sm text-gray-500 block mt-1" href={user.website_url} target="_blank" rel="noreferrer">
+                        {user.website_url}
+                      </a>
+                    )}
                   </div>
                   <div className="flex space-x-3">
                     <button className="bg-yellow-400 hover:bg-yellow-500 text-gray-800 px-6 py-2 rounded-lg font-medium flex items-center">
                       <BarChart3 className="w-4 h-4 mr-2" />
                       Ver estadísticas
                     </button>
-                    <button 
-                      onClick={() => setShowDonationModal(true)}
-                      className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-lg font-medium"
-                    >
-                      Donar
-                    </button>
+
+                    {/* Mostrar botón de donar sólo si el user permite donaciones */}
+                    {user.allow_donations ? (
+                      <button
+                        onClick={() => setShowDonationModal(true)}
+                        className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-lg font-medium"
+                      >
+                        Donar
+                      </button>
+                    ) : (
+                      <button
+                        title="El usuario no acepta donaciones"
+                        className="bg-gray-200 text-gray-500 px-6 py-2 rounded-lg font-medium cursor-not-allowed"
+                        disabled
+                      >
+                        Donaciones cerradas
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -168,7 +212,6 @@ const ProfilePageWithDonation: React.FC = () => {
           <div className="w-80">
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h3 className="text-lg font-semibold mb-4">Principales Donadores</h3>
-              
               <div className="space-y-3">
                 {topDonors.map((donor) => (
                   <div key={donor.id} className="flex items-center p-3 border border-gray-200 rounded-lg">
@@ -197,7 +240,7 @@ const ProfilePageWithDonation: React.FC = () => {
               <h3 className="text-2xl font-semibold text-teal-700">
                 Estás a unos pasos de ayudar a alguien...
               </h3>
-              <button 
+              <button
                 onClick={() => setShowDonationModal(false)}
                 className="text-gray-400 hover:text-gray-600"
               >
@@ -238,6 +281,4 @@ const ProfilePageWithDonation: React.FC = () => {
       )}
     </div>
   );
-};
-
-export default ProfilePageWithDonation;
+}

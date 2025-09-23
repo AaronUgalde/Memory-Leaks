@@ -6,6 +6,8 @@ dotenv.config();
 
 import authRoutes from './routes/auth';
 import walletRoutes from './routes/wallets';
+import usersSearchRoutes from './routes/search';
+import getUserByIdRouter from './routes/get_user_by_id';
 import donationRoutes from './routes/donations';
 
 const app = express();
@@ -18,6 +20,8 @@ app.use(cookieParser());
 // routes
 app.use('/api/auth', authRoutes);
 app.use('/api/wallets', walletRoutes);
+app.use('/api', getUserByIdRouter);
+app.use('/api/usersSearch', usersSearchRoutes);
 app.use('/api/donations', donationRoutes);
 
 // health
