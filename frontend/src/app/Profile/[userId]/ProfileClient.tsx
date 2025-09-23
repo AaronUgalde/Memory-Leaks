@@ -1,9 +1,10 @@
+// src/app/profile/[userId]/ProfileWithDonationClient.tsx
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Search, Plus, CreditCard, Settings, BarChart3, Heart, Share, X } from 'lucide-react';
-import { useParams } from "next/navigation";
+import api from '../../../lib/api';
 
 interface User {
   id: string;
@@ -34,48 +35,18 @@ interface Post {
   shares: number;
 }
 
-const ProfilePageWithDonation: React.FC = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [showDonationModal, setShowDonationModal] = useState(true);
+export default function ProfileWithDonationClient({ initialUser }: { initialUser: User | null }) {
+  const [user] = useState<User | null>(initialUser);
+  const [showDonationModal, setShowDonationModal] = useState(false);
   const [donationAmount, setDonationAmount] = useState('');
   const router = useRouter();
-  const pathname = usePathname();
-  
 
-  // Extraer el ID desde la ruta: /profile/[id]
-  //const userId = pathname.split('/').pop();
-  const {userId } = useParams();
-
-  useEffect(() => {
-    if (!userId) return;
-
-    const fetchUser = async () => {
-      try {
-        const res = await fetch(`http://localhost:5000/api/users/${userId}`);
-        if (!res.ok) throw new Error('Usuario no encontrado');
-        const data = await res.json();
-        setUser(data);
-      } catch (err) {
-        console.error(err);
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, [userId]);
-
-  const handleDonate = () => {
-    console.log('Donating:', donationAmount);
-    setShowDonationModal(false);
-  };
+  if (!user) return <div className="p-8">Usuario no encontrado</div>;
 
   const topDonors: Donor[] = [
-    { id: '1', name: 'Donador numero 1', followers: '# seguidores', rank: 1 },
-    { id: '2', name: 'Donador num. 2', followers: '# seguidores', rank: 2 },
-    { id: '3', name: 'Donador num. 3', followers: '# seguidores', rank: 3 },
+    { id: '1', name: 'Donador numero 1', followers: '1.2k seguidores', rank: 1 },
+    { id: '2', name: 'Donador num. 2', followers: '800 seguidores', rank: 2 },
+    { id: '3', name: 'Donador num. 3', followers: '500 seguidores', rank: 3 },
   ];
 
   const posts: Post[] = [
@@ -95,7 +66,23 @@ const ProfilePageWithDonation: React.FC = () => {
     }
   ];
 
-  if (loading) return <div>Cargando perfil...</div>;
+  const handleDonate = async () => {
+    const initiateRespone = await api.post('/donations',
+      {
+        recipientUserId: user.id,
+        amount: donationAmount,
+        currency: "USD",
+        message: "Gran contenido, gracias!",
+        isAnonymous: false
+      }
+    );
+    console.log('Respuesta de la API de donación:', initiateRespone.data);
+    // Aquí iría la lógica real de donación
+    console.log('Donando a:', user.id, 'monto:', donationAmount);
+    setShowDonationModal(false);
+    setDonationAmount('');
+  };
+
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -117,11 +104,15 @@ const ProfilePageWithDonation: React.FC = () => {
         {/* Header */}
         <div className="flex justify-end items-center mb-8">
           <div className="flex items-center">
-            <span className="text-gray-700 mr-3">{user?.display_name || 'Usuario'}</span>
-            <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg bg-blue-500">
-              {user?.profile_image_url ? (
-                <img src={user.profile_image_url} alt="Profile" className="w-10 h-10 rounded-full" />
-              ) : '👨‍💼'}
+            <span className="text-gray-700 mr-3 cursor-pointer" onClick={() => router.push(`/profile/${user.username}`)}>
+              {user.display_name}
+            </span>
+            <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg bg-blue-500 overflow-hidden">
+              {user.profile_image_url ? (
+                <img src={user.profile_image_url} alt={`${user.display_name} avatar`} className="w-10 h-10 object-cover" />
+              ) : (
+                '👨‍💼'
+              )}
             </div>
           </div>
         </div>
@@ -131,32 +122,57 @@ const ProfilePageWithDonation: React.FC = () => {
           <div className="flex-1">
             {/* Hero Image */}
             <div className="relative mb-6 rounded-lg overflow-hidden">
-              <img src="/api/placeholder/800/200" alt="Profile banner" className="w-full h-48 object-cover" />
+              <img
+                src="/api/placeholder/800/200"
+                alt="Profile banner"
+                className="w-full h-48 object-cover"
+              />
               <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent" />
             </div>
 
             {/* Profile Section */}
             <div className="flex items-start mb-8">
-              <div className="w-24 h-24 bg-yellow-400 rounded-full flex items-center justify-center text-4xl mr-6 -mt-12 relative z-10 border-4 border-white">
-                {user?.profile_image_url ? <img src={user.profile_image_url} alt="Avatar" className="w-full h-full rounded-full" /> : '🎭'}
+              <div className="w-24 h-24 bg-yellow-400 rounded-full flex items-center justify-center text-4xl mr-6 -mt-12 relative z-10 border-4 border-white overflow-hidden">
+                {user.profile_image_url ? (
+                  <img src={user.profile_image_url} alt="avatar" className="w-24 h-24 object-cover rounded-full" />
+                ) : (
+                  '🎭'
+                )}
               </div>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h1 className="text-3xl font-bold text-gray-800 mb-2">{user?.display_name}</h1>
-                    <p className="text-teal-600 font-medium">{user?.bio || '# Seguidores'}</p>
+                    <h1 className="text-3xl font-bold text-gray-800 mb-2">{user.display_name}</h1>
+                    <p className="text-teal-600 font-medium">{user.bio || '# Sin bio'}</p>
+                    {user.website_url && (
+                      <a className="text-sm text-gray-500 block mt-1" href={user.website_url} target="_blank" rel="noreferrer">
+                        {user.website_url}
+                      </a>
+                    )}
                   </div>
                   <div className="flex space-x-3">
                     <button className="bg-yellow-400 hover:bg-yellow-500 text-gray-800 px-6 py-2 rounded-lg font-medium flex items-center">
                       <BarChart3 className="w-4 h-4 mr-2" />
                       Ver estadísticas
                     </button>
-                    <button 
-                      onClick={() => setShowDonationModal(true)}
-                      className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-lg font-medium"
-                    >
-                      Donar
-                    </button>
+
+                    {/* Mostrar botón de donar sólo si el user permite donaciones */}
+                    {user.allow_donations ? (
+                      <button
+                        onClick={() => setShowDonationModal(true)}
+                        className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-lg font-medium"
+                      >
+                        Donar
+                      </button>
+                    ) : (
+                      <button
+                        title="El usuario no acepta donaciones"
+                        className="bg-gray-200 text-gray-500 px-6 py-2 rounded-lg font-medium cursor-not-allowed"
+                        disabled
+                      >
+                        Donaciones cerradas
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -168,7 +184,11 @@ const ProfilePageWithDonation: React.FC = () => {
               <div className="grid grid-cols-2 gap-6">
                 {posts.map((post) => (
                   <div key={post.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
-                    <img src={post.image} alt="Post" className="w-full h-48 object-cover" />
+                    <img
+                      src={post.image}
+                      alt="Post"
+                      className="w-full h-48 object-cover"
+                    />
                     <div className="p-4">
                       <p className="text-gray-700 mb-3">{post.description}</p>
                       <div className="flex items-center space-x-4 text-sm text-gray-500">
@@ -220,7 +240,10 @@ const ProfilePageWithDonation: React.FC = () => {
               <h3 className="text-2xl font-semibold text-teal-700">
                 Estás a unos pasos de ayudar a alguien...
               </h3>
-              <button onClick={() => setShowDonationModal(false)} className="text-gray-400 hover:text-gray-600">
+              <button
+                onClick={() => setShowDonationModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
                 <X className="w-6 h-6" />
               </button>
             </div>
@@ -239,10 +262,16 @@ const ProfilePageWithDonation: React.FC = () => {
             </div>
 
             <div className="flex space-x-3">
-              <button onClick={() => setShowDonationModal(false)} className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-3 px-4 rounded-lg font-medium transition-colors">
+              <button
+                onClick={() => setShowDonationModal(false)}
+                className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-3 px-4 rounded-lg font-medium transition-colors"
+              >
                 Cancelar
               </button>
-              <button onClick={handleDonate} className="flex-1 bg-purple-500 hover:bg-purple-600 text-white py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center">
+              <button
+                onClick={handleDonate}
+                className="flex-1 bg-purple-500 hover:bg-purple-600 text-white py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center"
+              >
                 <span className="mr-2">📹</span>
                 Donar
               </button>
@@ -252,6 +281,4 @@ const ProfilePageWithDonation: React.FC = () => {
       )}
     </div>
   );
-};
-
-export default ProfilePageWithDonation;
+}

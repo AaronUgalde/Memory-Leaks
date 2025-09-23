@@ -17,9 +17,8 @@ router.get(
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
-
+    console.log('Query de búsqueda:', req.query);
     const q = String(req.query.q || '').trim(); // Obtener query o string vacío
-    
     try {
       let sql: string;
       let params: any[];

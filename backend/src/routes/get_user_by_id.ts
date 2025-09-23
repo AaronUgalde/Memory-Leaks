@@ -15,8 +15,7 @@ router.get('/users/:id', async (req: Request, res: Response) => {
   try {
     const sql = `
       SELECT id, username, display_name, bio, profile_image_url, website_url,
-             user_type, organization_type, verification_status, allow_donations,
-             created_at
+             user_type, organization_type, verification_status, allow_donations
       FROM users
       WHERE id = $1 AND is_active = TRUE
       LIMIT 1;
