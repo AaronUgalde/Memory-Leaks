@@ -67,7 +67,7 @@ export default function ProfileWithDonationClient({ initialUser }: { initialUser
   ];
 
   const handleDonate = async () => {
-    const initiateRespone = await api.post('/donations',
+    const initiateRespone = await api.post('/donations/initiate',
       {
         recipientUserId: user.id,
         amount: donationAmount,
@@ -157,7 +157,7 @@ export default function ProfileWithDonationClient({ initialUser }: { initialUser
                     </button>
 
                     {/* Mostrar botón de donar sólo si el user permite donaciones */}
-                    {user.allow_donations ? (
+                    {true ? (
                       <button
                         onClick={() => setShowDonationModal(true)}
                         className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-lg font-medium"
