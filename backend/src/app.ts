@@ -6,6 +6,7 @@ dotenv.config();
 
 import authRoutes from './routes/auth';
 import walletRoutes from './routes/wallets';
+import donationRoutes from './routes/donations';
 
 const app = express();
 app.use(cors({
@@ -17,6 +18,7 @@ app.use(cookieParser());
 // routes
 app.use('/api/auth', authRoutes);
 app.use('/api/wallets', walletRoutes);
+app.use('/api/donations', donationRoutes);
 
 // health
 app.get('/health', (_req, res) => res.json({ ok: true }));
