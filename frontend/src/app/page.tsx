@@ -1,5 +1,7 @@
+"use client";
 import React from 'react';
 import { Search, Plus, CreditCard, Settings } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface Transaction {
   id: string;
@@ -24,6 +26,8 @@ const Dashboard: React.FC = () => {
     { name: 'wallet_adress_2', label: 'Nombre' },
   ];
 
+  const router = useRouter();
+
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
@@ -31,10 +35,18 @@ const Dashboard: React.FC = () => {
         <div className="text-2xl font-bold">Olbil</div>
         
         <nav className="flex flex-col space-y-6">
-          <Search className="w-6 h-6 cursor-pointer hover:text-teal-200" />
-          <Plus className="w-6 h-6 cursor-pointer hover:text-teal-200" />
-          <CreditCard className="w-6 h-6 cursor-pointer hover:text-teal-200 bg-teal-600 p-1 rounded" />
-          <CreditCard className="w-6 h-6 cursor-pointer hover:text-teal-200" />
+          <Search 
+            className="w-6 h-6 cursor-pointer hover:text-teal-200" 
+            onClick={() => router.push('/SearchProfile')} 
+          />
+          <Plus 
+            className="w-6 h-6 cursor-pointer hover:text-teal-200" 
+            onClick={() => alert('Funcionalidad en desarrollo')} 
+          />
+          <CreditCard 
+            className="w-6 h-6 cursor-pointer hover:text-teal-200" 
+            onClick={() => router.push('/AddWallet')} 
+          />
         </nav>
         
         <div className="mt-auto">

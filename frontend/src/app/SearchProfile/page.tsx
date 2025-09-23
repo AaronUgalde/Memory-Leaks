@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Search, Plus, CreditCard, Settings, BarChart3 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface Profile {
   id: string;
@@ -14,6 +15,7 @@ interface Profile {
 
 const ProfileSearch: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const router = useRouter();
 
   const profiles: Profile[] = [
     {
@@ -41,10 +43,18 @@ const ProfileSearch: React.FC = () => {
         <div className="text-2xl font-bold">Olbil</div>
         
         <nav className="flex flex-col space-y-6">
-          <Search className="w-6 h-6 cursor-pointer hover:text-teal-200 bg-yellow-400 text-teal-700 p-1 rounded" />
-          <Plus className="w-6 h-6 cursor-pointer hover:text-teal-200" />
-          <CreditCard className="w-6 h-6 cursor-pointer hover:text-teal-200" />
-          <CreditCard className="w-6 h-6 cursor-pointer hover:text-teal-200" />
+          <Search 
+            className="w-6 h-6 cursor-pointer hover:text-teal-200" 
+            onClick={() => router.push('/SearchProfile')} 
+          />
+          <Plus 
+            className="w-6 h-6 cursor-pointer hover:text-teal-200" 
+            onClick={() => alert('Funcionalidad en desarrollo')} 
+          />
+          <CreditCard 
+            className="w-6 h-6 cursor-pointer hover:text-teal-200" 
+            onClick={() => router.push('/AddWallet')} 
+          />
         </nav>
         
         <div className="mt-auto">
@@ -60,7 +70,7 @@ const ProfileSearch: React.FC = () => {
           
           {/* User Profile */}
           <div className="flex items-center">
-            <span className="text-gray-700 mr-3">nombre_usuario</span>
+            <span className="text-gray-700 mr-3" onClick={() => router.push('/')}>nombre_usuario</span>
             <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-lg">
               👨‍💼
             </div>

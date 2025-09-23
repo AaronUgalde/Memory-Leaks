@@ -2,11 +2,13 @@
 
 import React, { useState } from 'react';
 import { Search, Plus, CreditCard, Settings, ChevronDown } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function AddWalletPage() {
   const [walletAddress, setWalletAddress] = useState('https://ip.interledger-test.dev/ejemplo');
   const [keyId, setKeyId] = useState('');
   const [keyIdentifier, setKeyIdentifier] = useState('');
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,10 +37,18 @@ export default function AddWalletPage() {
       <div className="w-32 bg-teal-500 text-white flex flex-col items-center py-6 space-y-8">
         <div className="text-2xl font-bold">Olbil</div>
         <nav className="flex flex-col space-y-6">
-          <Search className="w-6 h-6 cursor-pointer hover:text-teal-200" />
-          <Plus className="w-6 h-6 cursor-pointer hover:text-teal-200" />
-          <CreditCard className="w-6 h-6 cursor-pointer hover:text-teal-200 bg-yellow-400 text-teal-700 p-1 rounded" />
-          <CreditCard className="w-6 h-6 cursor-pointer hover:text-teal-200" />
+          <Search 
+            className="w-6 h-6 cursor-pointer hover:text-teal-200" 
+            onClick={() => router.push('/SearchProfile')} 
+          />
+          <Plus 
+            className="w-6 h-6 cursor-pointer hover:text-teal-200" 
+            onClick={() => alert('Funcionalidad en desarrollo')} 
+          />
+          <CreditCard 
+            className="w-6 h-6 cursor-pointer hover:text-teal-200" 
+            onClick={() => router.push('/AddWallet')} 
+          />
         </nav>
         <div className="mt-auto">
           <Settings className="w-6 h-6 cursor-pointer hover:text-teal-200" />
@@ -49,7 +59,7 @@ export default function AddWalletPage() {
       <div className="flex-1 flex items-center justify-center p-8 relative">
         {/* User Profile */}
         <div className="absolute top-6 right-6 flex items-center">
-          <span className="text-gray-700 mr-3">nombre_usuario</span>
+          <span className="text-gray-700 mr-3" onClick={() => router.push('/')}>nombre_usuario</span>
           <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-lg">
             👨‍💼
           </div>
