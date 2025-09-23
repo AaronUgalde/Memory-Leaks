@@ -183,4 +183,8 @@ router.get('/me', requireAuth, async (req: AuthRequest, res: Response) => {
   }
 });
 
+// TODO: Obtener usurio por un id 
+
+// TODO: Obtener usuarios WHERE ILIKE para las busquedas
+
 export default router;
