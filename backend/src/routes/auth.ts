@@ -57,7 +57,22 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
 
     const {
-      // TODO: Poner Datos
+      email,
+      password,
+      nombre,
+      apellido_paterno,
+      apellido_materno,
+      tipo_domicilio,
+      calle,
+      colonia,
+      ciudad,
+      estado,
+      codigo_postal,
+      numero_exterior,
+      numero_interior,
+      telefonoPrincipal,
+      telefonosEmergencia, // se espera un arreglo de teléfonos
+      remember,
     } = req.body;
 
     try {
@@ -66,16 +81,31 @@ router.post(
 
       const pwHash = await hashPassword(password);
       const insertOwnerQuery = `
-      `;  // TODO: Poner Query
+        INSERT INTO owners (
+          email, password_hash, nombre, apellido_paterno, apellido_materno,
+          tipo_domicilio, calle, colonia, ciudad, estado, codigo_postal,
+          numero_exterior, numero_interior
+        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+        RETURNING owner_id, email, nombre, apellido_paterno, apellido_materno, role;
+      `;
       const ownerResult = await db.query(insertOwnerQuery, [
-        // TODO: Poner Datos necesarios
+        email,
+        pwHash,
+        nombre,
+        apellido_paterno,
+        apellido_materno,
+        tipo_domicilio,
+        calle,
+        colonia,
+        ciudad,
+        estado,
+        codigo_postal,
+        numero_exterior,
+        numero_interior,
       ]);
       const owner = ownerResult.rows[0];
 
-
-      // Si vienen teléfonos de emergencia, se insertan (se ignoran valores vacíos)
-      
-
+    
       // Generar token y setear cookie
       const payload = { owner_id: owner.owner_id, role: owner.role };
       const token = jwt.sign(payload, getJwtSecret(), signOptions);
@@ -109,22 +139,20 @@ router.post(
   body('email').isEmail(),
   body('password').isLength({ min: 1 }),
   async (req: Request, res: Response) => {
-    const 
-    { 
-      // TODO 
-    } = req.body;
+    const { email, password, remember } = req.body;
     try {
-      const q = ''; // TODO
-      const r = await db.query(q, [ /* TODO */ ]);
+      const q = 'SELECT owner_id, email, password_hash, nombre, role FROM owners WHERE email = $1';
+      const r = await db.query(q, [email]);
       if (r.rowCount === 0) return res.status(400).json({ error: 'Credenciales inválidas' });
 
       const user = r.rows[0];
-      const ok = await comparePassword( /* TODO */ );
+      const ok = await comparePassword(password, user.password_hash);
       if (!ok) return res.status(400).json({ error: 'Credenciales inválidas' });
 
       const payload = { owner_id: user.owner_id, role: user.role };
       const token = jwt.sign(payload, getJwtSecret(), signOptions);
 
+      const maxAge = getCookieMaxAgeMs(remember);
 
       res.cookie('token', token, {
         httpOnly: true,
@@ -133,7 +161,8 @@ router.post(
         ...(maxAge ? { maxAge } : {}),
       });
 
-      // TODO: res.json({  } });
+      // Devolver solo datos públicos del owner para que frontend pueda mostrar nombre, etc.
+      res.json({ owner: { owner_id: user.owner_id, email: user.email, nombre: user.nombre, role: user.role } });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: 'Error del servidor' });
