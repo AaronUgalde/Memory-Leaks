@@ -6,8 +6,8 @@ dotenv.config();
 
 import authRoutes from './routes/auth';
 import walletRoutes from './routes/wallets';
-import userByIdRoutes from './routes/get_user_by_id';
 import usersSearchRoutes from './routes/search';
+import getUserByIdRouter from './routes/get_user_by_id';
 
 const app = express();
 app.use(cors({
@@ -19,7 +19,7 @@ app.use(cookieParser());
 // routes
 app.use('/api/auth', authRoutes);
 app.use('/api/wallets', walletRoutes);
-app.use('/api/get_user_by_id', userByIdRoutes);
+app.use('/api', getUserByIdRouter);
 app.use('/api/usersSearch', usersSearchRoutes);
 
 // health

@@ -24,7 +24,6 @@ const ProfileSearch: React.FC = () => {
   const searchProfiles = async (query: string) => {
     setLoading(true);
     try {
-      // Si no hay query, busca con string vacío para obtener todos
       const response = await api.get('/usersSearch/searchProfile', { 
         params: { q: query || '' } 
       });
@@ -46,12 +45,15 @@ const ProfileSearch: React.FC = () => {
     }
   };
 
-  // Cargar todos los perfiles al inicio
+  // Función para navegar al perfil
+  const handleProfileClick = (profileId: string) => {
+    router.push(`/Profile/${profileId}`);
+  };
+
   useEffect(() => {
     searchProfiles('');
   }, []);
 
-  // Búsqueda con debounce
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       searchProfiles(searchQuery);
@@ -94,7 +96,9 @@ const ProfileSearch: React.FC = () => {
           
           {/* User Profile */}
           <div className="flex items-center">
-            <span className="text-gray-700 mr-3" onClick={() => router.push('/')}>nombre_usuario</span>
+            <span className="text-gray-700 mr-3 cursor-pointer hover:text-teal-600" onClick={() => router.push('/')}>
+              nombre_usuario
+            </span>
             <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-lg">
               👨‍💼
             </div>
@@ -121,7 +125,11 @@ const ProfileSearch: React.FC = () => {
         {/* Search Results */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           {profiles.map((profile) => (
-            <div key={profile.id} className="bg-gradient-to-br from-teal-100 to-cyan-100 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
+            <div 
+              key={profile.id} 
+              onClick={() => handleProfileClick(profile.id)}
+              className="bg-gradient-to-br from-teal-100 to-cyan-100 rounded-lg p-6 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer transform hover:scale-105"
+            >
               <div className="flex items-start space-x-4">
                 <div className="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center text-2xl flex-shrink-0">
                   {profile.avatar}
