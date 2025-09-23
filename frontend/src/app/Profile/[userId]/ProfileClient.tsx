@@ -79,8 +79,41 @@ export default function ProfileWithDonationClient({ initialUser }: { initialUser
     console.log('Respuesta de la API de donación:', initiateRespone.data);
     // Aquí iría la lógica real de donación
     console.log('Donando a:', user.id, 'monto:', donationAmount);
-    setShowDonationModal(false);
-    setDonationAmount('');
+
+    const donationId = initiateRespone.data.donationId;
+
+
+    //alert('Dinero enviado con exito! ID de donación: ' + donationId);
+
+    const create_quote = await api.post(`/donations/${donationId}/create-quote`);
+    console.log('Quote creado:', create_quote.data);
+
+    const request_out_grant = await api.post(`/donations/${donationId}/request-grant`);
+    console.log('Grant soclicitado:', request_out_grant.data);
+
+    const url_auth = request_out_grant.data.interactionUrl;
+    // Simular que el usuario autoriza la transacción en otra pestaña
+    
+    const authWindow = window.open(url_auth, '_blank');
+    if (!authWindow) {
+      alert('No se pudo abrir la ventana de autorización.');
+      return;
+    }
+
+    // Esperar a que el usuario cierre la ventana
+    const waitForClose = () => new Promise<void>((resolve) => {
+      const timer = setInterval(() => {
+        if (authWindow.closed) {
+          clearInterval(timer);
+          resolve();
+        }
+      }, 500);
+    });
+
+    await waitForClose();
+
+    const complete_donation = await api.post(`/donations/${donationId}/complete`);
+    console.log('Donación completada:', complete_donation.data);
   };
 
 

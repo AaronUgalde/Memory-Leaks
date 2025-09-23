@@ -272,7 +272,7 @@ router.post('/:donationId/create-quote',
             const client = await createAuthenticatedClient({
                 walletAddressUrl: "https://ilp.interledger-test.dev/memory-leaks",
                 privateKey: "private.key",
-                keyId: process.env.OPEN_PAYMENTS_KEY_ID!
+                keyId: "16d89d13-73c5-4cfd-a16b-e3e9ca9bce80"
             });
 
             // Obtener información de las wallets
