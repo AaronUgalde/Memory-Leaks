@@ -18,7 +18,7 @@ backend/source/routes/donations.ts
 
 1. Clona en tu computadora el repositorio de  ([github](https://github.com/AaronUgalde/Memory-Leaks)), posteriormente abre la ubicación de tu proyecto desde el cmd (Command Prompt) y escribe
 
-	```sh
+```sh
 	npm install
 	
 ```
@@ -26,7 +26,6 @@ backend/source/routes/donations.ts
 2. Ingresa a la carpeta backend y crea un archivo ".env" (sin nombre, solo extensión) en dicho archivo copia lo siguiente
 
 ```
-
 DATABASE_URL = "postgres://avnadmin:AVNS_SWCSzR4ezZV2Jr4wKHN@bd-memory-leaks1-aaronugaldet-memoryleaks.k.aivencloud.com:10887/defaultdb"
 
 FRONTEND_URL = "http://localhost:3000"
@@ -37,15 +36,16 @@ JWT_SECRET = "your_jwt_secret_key"
 
 3. Por último en una ventana del command promp ingresa a la carpeta de frontend y ejecuta el siguiente comando
 	
-	```
-		cd frontend
-		npm run dev
-	```
+```sh
+    cd frontend
+    npm run dev
+```
 
 	De la misma manera, ejecuta el comando desde la carpeta de backend.
-	```
-		cd backend
-		npm run dev
-	```
+	
+```sh
+    cd backend
+    npm run dev
+```
   En la terminal del frontend se mostrará un enlace parecido a  http://localhost:3000 copia este link en un navegador y ¡listo! ya podrás ver el proyecto. 
 
