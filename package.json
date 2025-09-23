@@ -1,0 +1,27 @@
+{
+  "name": "memory-leaks",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AaronUgalde/Memory-Leaks.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AaronUgalde/Memory-Leaks/issues"
+  },
+  "homepage": "https://github.com/AaronUgalde/Memory-Leaks#readme",
+  "description": "",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "dependencies": {
+    "cors": "^2.8.5"
+  }
+}
