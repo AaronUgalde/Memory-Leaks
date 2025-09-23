@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Plus, CreditCard, Settings, BarChart3 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import api from '../../lib/api';
 
 interface Profile {
   id: string;
@@ -11,30 +12,53 @@ interface Profile {
   followers: string;
   donorStats: string;
   avatar: string;
+  username: string;
 }
 
 const ProfileSearch: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const profiles: Profile[] = [
-    {
-      id: '1',
-      title: 'Perfil encontrado',
-      description: 'descripción',
-      followers: '# seguidores',
-      donorStats: 'estadísticas de donadores',
-      avatar: '👨‍💼'
-    },
-    {
-      id: '2',
-      title: 'Perfil encontrado',
-      description: 'descripción',
-      followers: '# seguidores',
-      donorStats: 'estadísticas de donadores',
-      avatar: '👨‍💼'
+  const searchProfiles = async (query: string) => {
+    setLoading(true);
+    try {
+      // Si no hay query, busca con string vacío para obtener todos
+      const response = await api.get('/usersSearch/searchProfile', { 
+        params: { q: query || '' } 
+      });
+      const formattedProfiles = response.data.results.map((user: any) => ({
+        id: user.id,
+        title: user.display_name || user.username,
+        description: user.bio || 'Sin descripción',
+        followers: '-- seguidores',
+        donorStats: 'estadísticas de donadores',
+        avatar: user.profile_image_url || '👨‍💼',
+        username: user.username
+      }));
+      setProfiles(formattedProfiles);
+    } catch (err) {
+      console.error('Error searching:', err);
+      setProfiles([]);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  // Cargar todos los perfiles al inicio
+  useEffect(() => {
+    searchProfiles('');
+  }, []);
+
+  // Búsqueda con debounce
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      searchProfiles(searchQuery);
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery]);
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -84,12 +108,14 @@ const ProfileSearch: React.FC = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search"
+            placeholder="Buscar perfiles..."
             className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-lg"
           />
-          <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-            <span className="text-gray-400 text-sm">⌘</span>
-          </div>
+          {loading && (
+            <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-500"></div>
+            </div>
+          )}
         </div>
 
         {/* Search Results */}
@@ -105,6 +131,7 @@ const ProfileSearch: React.FC = () => {
                   <h3 className="text-lg font-semibold text-gray-800 mb-2">
                     {profile.title}
                   </h3>
+                  <p className="text-sm text-gray-500 mb-2">@{profile.username}</p>
                   <p className="text-gray-600 mb-3">
                     {profile.description}
                   </p>
@@ -121,6 +148,12 @@ const ProfileSearch: React.FC = () => {
             </div>
           ))}
         </div>
+
+        {!loading && profiles.length === 0 && (
+          <div className="text-center text-gray-500 mt-8">
+            No se encontraron perfiles
+          </div>
+        )}
       </div>
     </div>
   );
